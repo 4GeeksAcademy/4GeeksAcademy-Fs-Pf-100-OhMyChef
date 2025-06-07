@@ -36,7 +36,7 @@
 		"eslint-plugin-react": "^7.33.1",
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"eslint-plugin-react-refresh": "^0.4.3",
-		"vite": "^4.4.8"
+		"vite": "^6.3.5"
 	},
 	"babel": {
 		"presets": [
@@ -58,6 +58,7 @@
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-icons": "^5.5.0",
-		"react-router-dom": "^6.18.0"
+		"react-router-dom": "^6.18.0",
+		"recharts": "^2.15.3"
 	}
 }

@@ -12,8 +12,6 @@ userServices.register = async (formData) => {
     });
     if (!resp.ok) throw Error("something went wrong");
     const data = await resp.json();
-    
-
     return data;
   } catch (error) {
     console.log(error);
@@ -21,15 +19,16 @@ userServices.register = async (formData) => {
 };
 
 userServices.getUserinfo = async () => {
-  const resp = await fetch(backendUrl + "/api/private", {
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${backendUrl}/api/private`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("token"),
+      Authorization: `Bearer ${token}`,
     },
   });
-  if (!resp.ok) throw Error("something went wrong");
-  const data = await resp.json();
+  await new Promise((res) => setTimeout(res, 2000));
+  if (!response.ok) throw new Error("No se pudo obtener la información del usuario");
+  const data = await response.json();
   return data;
 };
 
@@ -44,8 +43,7 @@ userServices.login = async (formData) => {
     });
     if (!resp.ok) throw Error("something went wrong");
     const data = await resp.json();
-    sessionStorage.setItem("token", data.token);
-
+    sessionStorage.setItem("token", data.access_token);
     return data;
   } catch (error) {
     console.log(error);

@@ -16,6 +16,7 @@ export const initialStore = () => {
     ],
   };
 };
+
 export default function storeReducer(store, action = {}) {
   switch (action.type) {
     case "get_user_info":
@@ -33,10 +34,8 @@ export default function storeReducer(store, action = {}) {
         ...store,
         message: action.payload,
       };
-
     case "add_task":
       const { id, color } = action.payload;
-
       return {
         ...store,
         todos: store.todos.map((todo) =>

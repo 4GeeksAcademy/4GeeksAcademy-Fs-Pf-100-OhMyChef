@@ -12,3 +12,12 @@ button.bg-orange:hover {
 .vh-10 {
   height: 10vh !important;
 }
+.rtl-scroll {
+  direction: rtl;
+  text-align: left; 
+}
+
+.ltr-scroll{
+ direction: ltr;
+  text-align: left; 
+}

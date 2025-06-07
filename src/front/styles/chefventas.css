@@ -1,0 +1,70 @@
+.recharts-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.recharts-legend-wrapper {
+  width: 100% !important;
+  height: auto;
+  bottom: 20px !important;
+}
+.titulo {
+  color: #4286b7;
+}
+
+.color-green {
+  color: green;
+}
+.color-blue {
+  color: #03a1d1;
+}
+.caja-azul {
+  background: #5adeff66;
+  border-radius: 6px;
+  padding: 4px;
+  color: #027b8c !important;
+  max-width: 120px;
+}
+@media (max-width: 842px) {
+  .gastos {
+    font-size: 1.1rem !important;
+    padding-top: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .recharts-legend-wrapper {
+    bottom: 6px !important;
+    font-size: 13px;
+  }
+  .graficoVentas {
+    margin-left: 0px !important;
+  }
+}
+
+@media (max-width: 580px) {
+  .graficoVentas {
+    flex-direction: column;
+    margin-bottom: 48px;
+    padding-left: 0px !important;
+  }
+  .gastos {
+    font-size: rem !important;
+    justify-content: space-around;
+  }
+  .graficoVentas span:not(:empty) {
+    font-size: 0.9rem;
+  }
+  .graficoVentas span.text-secondary:not(:empty) {
+    font-size: 1.1rem !important;
+  }
+  .titulo {
+    margin-bottom: 0;
+  }
+  .graficoGastos {
+    flex-direction: column;
+  }
+}

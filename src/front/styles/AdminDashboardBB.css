@@ -1,7 +1,7 @@
 .dashboard-container {
   align-content: center;
   padding: 30px;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   background-color: #f5f7fa;
 }
 
@@ -26,7 +26,7 @@
   padding: 20px;
   width: 300px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .restaurant-card h3 {
@@ -88,7 +88,7 @@
   width: 200px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn {
@@ -100,4 +100,9 @@
   cursor: pointer;
   border-radius: 10px;
   margin-bottom: 10px;
+}
+@media (max-width: 962px) {
+  .restaurant-card {
+    width: 100%;
+  }
 }

@@ -179,7 +179,7 @@ def login():
         if not check_password_hash(user.password, data["password"]):
             return jsonify({"success": False, "msg": "Email o contraseña incorrectos"}), 401
 
-        token = create_access_token(identity=user.id)
+        token = create_access_token(identity=str(user.id))
 
         data = user.serialize()
 
@@ -320,35 +320,64 @@ def crear_gasto():
     if not data:
         return jsonify({"msg": "Datos no recibidos"}), 400
 
-    fecha = data.get("fecha")
-    monto = data.get("monto")
-    categoria = data.get("categoria")
-    proveedor_id = data.get("proveedor_id")
-    usuario_id = data.get("usuario_id")
-    restaurante_id = data.get("restaurante_id")
-    nota = data.get("nota")
-    archivo_adjunto = data.get("archivo_adjunto")
+    
+    if isinstance(data, list):
+        try:
+            for g in data:
+                if not g.get("fecha") or not g.get("monto") or not g.get("proveedor_id") or not g.get("usuario_id") or not g.get("restaurante_id"):
+                    return jsonify({"msg": "Faltan campos obligatorios en uno de los gastos"}), 400
 
-    if not fecha or not monto or not proveedor_id or not usuario_id or not restaurante_id:
-        return jsonify({"msg": "Faltan campos obligatorios"}), 400
+                nuevo_gasto = Gasto(
+                    fecha=g["fecha"],
+                    monto=g["monto"],
+                    categoria=g.get("categoria"),
+                    proveedor_id=g["proveedor_id"],
+                    usuario_id=g["usuario_id"],
+                    restaurante_id=g["restaurante_id"],
+                    nota=g.get("nota"),
+                    archivo_adjunto=g.get("archivo_adjunto")
+                )
+                db.session.add(nuevo_gasto)
 
-    try:
-        nuevo_gasto = Gasto(
-            fecha=fecha,
-            monto=monto,
-            categoria=categoria,
-            proveedor_id=proveedor_id,
-            usuario_id=usuario_id,
-            restaurante_id=restaurante_id,
-            nota=nota,
-            archivo_adjunto=archivo_adjunto
-        )
-        db.session.add(nuevo_gasto)
-        db.session.commit()
-        return jsonify({"msg": "Gasto registrado correctamente"}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"msg": "Error al registrar el gasto", "error": str(e)}), 500
+            db.session.commit()
+            return jsonify({"msg": "Gastos registrados correctamente"}), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": "Error al registrar gastos", "error": str(e)}), 500
+
+    
+    else:
+        fecha = data.get("fecha")
+        monto = data.get("monto")
+        categoria = data.get("categoria")
+        proveedor_id = data.get("proveedor_id")
+        usuario_id = data.get("usuario_id")
+        restaurante_id = data.get("restaurante_id")
+        nota = data.get("nota")
+        archivo_adjunto = data.get("archivo_adjunto")
+
+        if not fecha or not monto or not proveedor_id or not usuario_id or not restaurante_id:
+            return jsonify({"msg": "Faltan campos obligatorios"}), 400
+
+        try:
+            nuevo_gasto = Gasto(
+                fecha=fecha,
+                monto=monto,
+                categoria=categoria,
+                proveedor_id=proveedor_id,
+                usuario_id=usuario_id,
+                restaurante_id=restaurante_id,
+                nota=nota,
+                archivo_adjunto=archivo_adjunto
+            )
+            db.session.add(nuevo_gasto)
+            db.session.commit()
+            return jsonify({"msg": "Gasto registrado correctamente"}), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": "Error al registrar el gasto", "error": str(e)}), 500
+
 
 
 @api.route('/gastos/<int:id>', methods=['GET'])

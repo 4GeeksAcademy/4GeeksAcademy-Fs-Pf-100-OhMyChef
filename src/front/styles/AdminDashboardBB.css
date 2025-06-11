@@ -72,14 +72,17 @@
   text-decoration: none;
 }
 
-.quick-actions {
+.quick-actions-section {
   margin-top: 40px;
 }
 
-.actions {
+.actions-grid {
   display: flex;
   gap: 20px;
   margin-top: 10px;
+  display: flex;
+  align-content: space-around;
+  justify-content: space-between;
 }
 
 .action-card {

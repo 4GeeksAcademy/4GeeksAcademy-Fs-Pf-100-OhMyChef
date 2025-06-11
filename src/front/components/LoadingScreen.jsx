@@ -3,7 +3,7 @@ import logo from "../assets/img/logo.svg";
 
 export const LoadingScreen = () => {
   return (
-    <div className="d-flex flex-column justify-content-center align-items-center vh-100 bg-dark text-white">
+    <div className="d-flex flex-column justify-content-center align-items-center vh-100 bg-white text-dark">
       <img
         src={logo}
         alt="OhMyChef Logo"

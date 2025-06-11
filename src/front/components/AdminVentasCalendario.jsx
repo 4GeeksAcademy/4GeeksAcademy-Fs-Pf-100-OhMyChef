@@ -4,6 +4,7 @@ import { Form, Card, Row, Col, Button } from "react-bootstrap";
 const AdminVentasCalendario = ({ buttons, fromDate, toDate, selectLabel, selectOptions }) => {
     return (
         <Card className="p-3 shadow-sm border-0">
+            
             <Row className="mb-3">
                 <Col xs={12} md="auto" className="mb-2 mb-md-0">
                     <Button variant="light" className="border d-flex align-items-center gap-2">

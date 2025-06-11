@@ -8,7 +8,7 @@ import { Login } from "./components/Login";
 import { RutaPrivada } from "./components/RutaPrivada.jsx";
 
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
-import { Restaurantes } from "./pages/admin/Restaurantes";
+// import { Restaurantes } from "./pages/admin/Restaurantes";
 import { CrearRestaurante } from "./pages/admin/CrearRestaurante";
 import { AdminVentas } from "./pages/admin/AdminVentas";
 import { AdminGastos } from "./pages/admin/AdminGastos";
@@ -34,6 +34,8 @@ import { Gastos as ChefGastos } from "./pages/chef/Gastos";
 import { Proveedores as ProveedoresChef } from "./pages/chef/Proveedores";
 import { Facturas } from "./pages/chef/Facturas";
 import { ChefSettings } from "./pages/chef/ChefSettings";
+import AdminRestaurante from "./pages/admin/AdminRestaurante.jsx";
+
 
 
 
@@ -48,7 +50,8 @@ export const router = createBrowserRouter(
       <Route element={<RutaPrivada allowedRoles={["admin", "encargado", "chef"]} />}>
         <Route element={<Layout />}>
           <Route path="admin/dashboard" element={<AdminDashboard />} />
-          <Route path="admin/restaurantes" element={<Restaurantes />} />
+          <Route path="admin/restaurantes" element={<AdminRestaurante />} />
+          <Route path="admin/restaurantes/*" element={<AdminRestaurante />} />
           <Route path="admin/crear-restaurante" element={<CrearRestaurante />} />
           <Route path="admin/ventas" element={<AdminVentas />} />
           <Route path="admin/gastos" element={<AdminGastos />} />

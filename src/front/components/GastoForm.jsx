@@ -162,12 +162,21 @@ export const GastoForm = () => {
           >
             + Añadir otro gasto
           </button>
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-succes">
             Registrar Gastos
           </button>
         </div>
 
-        {mensaje && <div className="alert alert-info mt-3">{mensaje}</div>}
+         {mensaje && (
+              <div
+                className={`alert mt-3 ${
+                  mensaje.toLowerCase().includes("éxito") ? "alert-success" : "alert-danger"
+                }`}
+              >
+         {mensaje}
+       </div>
+            )}
+
       </form>
     </div>
   );

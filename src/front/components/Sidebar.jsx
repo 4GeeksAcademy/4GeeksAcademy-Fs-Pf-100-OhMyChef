@@ -27,7 +27,7 @@ export const Sidebar = () => {
       <nav
         id="sidebar"
 
-        className={`sidebar menu d-flex flex-column p-3 ${menuall ? "w250" : ""
+        className={`sidebar menu d-flex flex-column p-3 ${menuall ? "w200" : ""
           }`}
 
       >

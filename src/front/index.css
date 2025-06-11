@@ -67,4 +67,7 @@ span.w-60 {
   .logout {
     left: 10px !important;
   }
+  .dashboard-container {
+    margin: 0 auto !important;
+  }
 }

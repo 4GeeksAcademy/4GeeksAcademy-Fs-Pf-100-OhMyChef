@@ -816,7 +816,8 @@ def obtener_restaurante(id):
         "id": restaurante.id,
         "nombre": restaurante.nombre,
         "direccion": restaurante.direccion,
-        "email_contacto": restaurante.email_contacto
+        "email_contacto": restaurante.email_contacto,
+        "moneda": restaurante.moneda
     }
 
     return jsonify(resultado), 200
@@ -836,8 +837,8 @@ def editar_restaurante(id):
 
     restaurante.nombre = data.get("nombre", restaurante.nombre)
     restaurante.direccion = data.get("direccion", restaurante.direccion)
-    restaurante.email_contacto = data.get(
-        "email_contacto", restaurante.email_contacto)
+    restaurante.email_contacto = data.get("email_contacto", restaurante.email_contacto)
+    restaurante.moneda = data.get("moneda", restaurante.moneda)
 
     try:
         db.session.commit()

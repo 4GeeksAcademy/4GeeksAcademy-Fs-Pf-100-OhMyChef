@@ -1,7 +1,73 @@
 .bg-orange {
-  background-color: #ff7741;
+  background-color: #ff7741 !important;
 }
 
 button.bg-orange:hover {
-  background-color: #f55d21;
+  background-color: #f55d21 !important;
+}
+
+.vh-90 {
+  height: 90vh !important;
+}
+.vh-70 {
+  height: 70vh !important;
+}
+.vh-10 {
+  height: 10vh !important;
+}
+.w-60 {
+  width: 60px !important;
+}
+/* .custom-sidebar {
+  overflow-x: hidden !important;
+} */
+.rtl-scroll {
+  direction: rtl;
+  text-align: left;
+}
+
+.ltr-scroll {
+  direction: ltr;
+  text-align: left;
+}
+.dashboard-container {
+  direction: ltr;
+}
+.custom-sidebar {
+  overflow: scroll !important;
+  direction: rtl;
+}
+
+.custom-sidebar > div {
+  direction: ltr;
+  width: 99.8%;
+}
+.wrapper-content {
+  height: 90vh !important;
+}
+
+span.w-auto {
+  width: auto !important;
+}
+span.w-60 {
+  width: auto !important;
+}
+@media (max-width: 972px) {
+  .wrapper-content {
+    height: 80vh !important;
+  }
+}
+@media (max-width: 767px) {
+  span.w-60 {
+    width: auto !important;
+  }
+  span.w-auto {
+    width: 60px !important;
+  }
+  .logout {
+    left: 10px !important;
+  }
+  .dashboard-container {
+    margin: 0 auto !important;
+  }
 }

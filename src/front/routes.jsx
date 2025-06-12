@@ -1,30 +1,89 @@
-// Import necessary components and functions from react-router-dom.
-
 import {
-    createBrowserRouter,
-    createRoutesFromElements,
-    Route,
+  createBrowserRouter, Route,
+  createRoutesFromElements,
 } from "react-router-dom";
-import { Layout } from "./pages/Layout";
+import { Layout } from "./layout/Layout";
 import { Home } from "./pages/Home";
-import { Single } from "./pages/Single";
-import { Demo } from "./pages/Demo";
+import { Login } from "./components/Login";
+import { RutaPrivada } from "./components/RutaPrivada.jsx";
+
+import { AdminDashboard } from "./pages/admin/AdminDashboard";
+// import { Restaurantes } from "./pages/admin/Restaurantes";
+import { CrearRestaurante } from "./pages/admin/CrearRestaurante";
+import { AdminVentas } from "./pages/admin/AdminVentas";
+import { AdminGastos } from "./pages/admin/AdminGastos";
+import { Usuarios } from "./pages/admin/Usuarios";
+import { CrearUsuario } from "./pages/admin/CrearUsuario";
+import { ConfigAdmin} from "./pages/configuracion/ConfigAdmin.jsx";
+import { ProveedoresDashboard } from "./pages/admin/ProveedoresDashboard";
+import  ProveedorRestauranteDetail  from "./pages/admin/ProveedorRestauranteDetail";
+
+
+
+import { EncargadoDashboard } from "./pages/encargado/EncargadoDashboard";
+import { RegistrarVenta } from "./pages/encargado/RegistrarVenta";
+import { ReporteVentas } from "./pages/encargado/ReporteVentas";
+import { EncargadoSettings } from "./pages/encargado/EncargadoSettings";
+import { RegistrarGasto as RegistrarGastoEncargado } from "./pages/encargado/RegistrarGasto";
+import { Proveedores as ProveedoresEncargado } from "./pages/encargado/Proveedores";
+import { EncargadoVentas } from "./pages/encargado/EncargadoVentas";
+import { EncargadoGastos } from "./pages/encargado/EncargadoGastos";
+
+import { ChefDashboard } from "./pages/chef/ChefDashboard";
+import { Gastos as ChefGastos } from "./pages/chef/Gastos";
+import { Proveedores as ProveedoresChef } from "./pages/chef/Proveedores";
+import { Facturas } from "./pages/chef/Facturas";
+import { ChefSettings } from "./pages/chef/ChefSettings";
+import AdminRestaurante from "./pages/admin/AdminRestaurante.jsx";
+
+
+
+
+
+
 
 export const router = createBrowserRouter(
-    createRoutesFromElements(
-    // CreateRoutesFromElements function allows you to build route elements declaratively.
-    // Create your routes here, if you want to keep the Navbar and Footer in all views, add your new routes inside the containing Route.
-    // Root, on the contrary, create a sister Route, if you have doubts, try it!
-    // Note: keep in mind that errorElement will be the default page when you don't get a route, customize that page to make your project more attractive.
-    // Note: The child paths of the Layout element replace the Outlet component with the elements contained in the "element" attribute of these child paths.
+  createRoutesFromElements(
+    <>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route element={<RutaPrivada allowedRoles={["admin", "encargado", "chef"]} />}>
+        <Route element={<Layout />}>
+          <Route path="admin/dashboard" element={<AdminDashboard />} />
+          <Route path="admin/restaurantes" element={<AdminRestaurante />} />
+          <Route path="admin/restaurantes/*" element={<AdminRestaurante />} />
+          <Route path="admin/crear-restaurante" element={<CrearRestaurante />} />
+          <Route path="admin/ventas" element={<AdminVentas />} />
+          <Route path="admin/gastos" element={<AdminGastos />} />
+          <Route path="admin/usuarios" element={<Usuarios />} />
+          <Route path="admin/crear-usuario" element={<CrearUsuario />} />
+          <Route path="admin/settings" element={<ConfigAdmin />} />
+          <Route path="admin/proveedores" element={<ProveedoresDashboard />} />
+          <Route path="admin/proveedores/restaurante/:id" element={<ProveedorRestauranteDetail />} />
+          <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
 
-      // Root Route: All navigation will start from here.
-      <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
 
-        {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
-        <Route path= "/" element={<Home />} />
-        <Route path="/single/:theId" element={ <Single />} />  {/* Dynamic route for single items */}
-        <Route path="/demo" element={<Demo />} />
+          <Route path="encargado/dashboard" element={<EncargadoDashboard />} />
+          <Route path="encargado/registrar-venta" element={<RegistrarVenta />} />
+          <Route path="encargado/reporte-ventas" element={<ReporteVentas />} />
+          <Route
+            path="encargado/registrar-gasto"
+            element={<RegistrarGastoEncargado />}
+          />
+          <Route
+            path="encargado/proveedores"
+            element={<ProveedoresEncargado />}
+          />
+          <Route path="encargado/ventas" element={<EncargadoVentas />} />
+          <Route path="encargado/gastos" element={<EncargadoGastos />} />
+          <Route path="encargado/settings" element={<EncargadoSettings />} />
+          <Route path="chef/dashboard" element={<ChefDashboard />} />
+          <Route path="chef/gastos" element={<ChefGastos />} />
+          <Route path="chef/proveedores" element={<ProveedoresChef />} />
+          <Route path="chef/facturas" element={<Facturas />} />
+          <Route path="chef/settings" element={<ChefSettings />} />
+        </Route>
       </Route>
-    )
+    </>
+  )
 );

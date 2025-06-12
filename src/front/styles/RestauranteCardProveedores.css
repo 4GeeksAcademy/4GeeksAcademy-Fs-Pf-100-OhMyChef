@@ -1,0 +1,82 @@
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.cardHeader h2 {
+    font-size: 1.1em;
+    color: #333;
+    margin: 0;
+}
+
+.zone {
+    background-color: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    color: #555;
+}
+
+.cardContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.city {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.percentage {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.cardFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.status {
+    font-size: 0.9em;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.viewAllButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    font-size: 0.9em;
+    padding: 0; 
+}
+
+.viewAllButton:hover {
+    text-decoration: underline;
+}
+
+

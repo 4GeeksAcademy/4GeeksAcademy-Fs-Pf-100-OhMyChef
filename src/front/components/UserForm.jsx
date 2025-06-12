@@ -1,0 +1,1 @@
+export const UserForm = () => <form>Formulario de usuario</form>;

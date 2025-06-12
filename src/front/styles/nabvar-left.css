@@ -1,0 +1,140 @@
+body {
+  overflow-x: hidden;
+}
+
+/* Sidebar base */
+.sidebar {
+  width: 250px;
+  background-color: #ffffff;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+/* Cuando colapsa (puedes añadir esta clase si haces un colapso global, no solo móvil) */
+.sidebar.collapsed {
+  width: 60px;
+  transition: width 0.3s ease;
+}
+.sidebar.menu .nav-link {
+  color: #000000;
+}
+/* Botón de colapso */
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Icono flecha girando */
+.bi-chevron-right {
+  display: inline-block;
+  -webkit-transform: rotate(0deg); /* Safari y Chrome antiguos */
+  -moz-transform: rotate(0deg); /* Firefox antiguos */
+  -ms-transform: rotate(0deg); /* IE */
+  -o-transform: rotate(0deg); /* Opera antiguos */
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
+
+.bi-chevron-right.rotated {
+  -webkit-transform: rotate(90deg); /* Safari y Chrome antiguos */
+  -moz-transform: rotate(90deg); /* Firefox antiguos */
+  -ms-transform: rotate(90deg); /* IE */
+  -o-transform: rotate(90deg); /* Opera antiguos */
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+/* Contenido principal */
+.content {
+  transition: margin-left 0.3s ease;
+  margin-left: 250px;
+  padding: 1rem;
+  width: 100%;
+}
+
+.content.expanded {
+  margin-left: 60px;
+}
+.sidebar.menu .nav-link {
+  /* Reservamos 1px de borde transparente para que el tamaño no cambie al hacer hover */
+  background-color: 1px solid transparent;
+  color: inherit;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar.menu .nav-link:hover {
+  background-color: #ff5d1d;
+  color: #fff;
+}
+.sidebar.menu .nav-link:hover i {
+  color: #fff;
+}
+
+.logout {
+  position: absolute;
+  bottom: 20px;
+  width: auto;
+  left: 20px;
+}
+.w-40 {
+  width: 40px;
+  transition: transform 0.3s ease;
+}
+a.nav-link.text-muted.d-flex .logout-row {
+  flex-direction: row !important;
+  width: 160px;
+}
+
+a.nav-link.text-muted.d-flex .logout-column {
+  flex-direction: column !important;
+  width: 40px;
+}
+.sidebar {
+  width: 220px;
+  background: white;
+}
+.sidebar.w200 {
+  width: 200px;
+}
+.sidebar.w70 {
+  width: 70px;
+}
+
+@media (max-width: 1100px) {
+  .collapse.chefmenu a {
+    padding: 10px 5px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .menu {
+    font-size: 1rem !important; /* Tamaño más pequeño solo para móviles */
+  }
+  .menu {
+    font-size: 1rem !important;
+  }
+
+  .collapse.chefmenu a {
+    padding: 10px 5px;
+    font-size: 0.85rem;
+  }
+  .sidebar {
+    width: 70px;
+  }
+  .content {
+    margin-left: 0;
+  }
+
+  a.nav-link.text-muted.d-flex.align-items-center.logout-row {
+    flex-direction: row !important;
+    width: 100px;
+  }
+
+  a.nav-link.text-muted.d-flex.align-items-center.logout-column {
+    flex-direction: column !important;
+    width: 40px;
+  }
+}

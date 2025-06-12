@@ -1,0 +1,1 @@
+export const VentaForm = () => <form>Formulario de ventas</form>;

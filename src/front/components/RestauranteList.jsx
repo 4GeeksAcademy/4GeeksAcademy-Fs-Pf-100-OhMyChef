@@ -1,0 +1,1 @@
+export const RestauranteList = () => <div>Listado de restaurantes</div>;

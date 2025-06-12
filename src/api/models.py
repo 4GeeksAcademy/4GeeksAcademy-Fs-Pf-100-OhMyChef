@@ -12,6 +12,7 @@ class Restaurante(db.Model):
     ventas = db.relationship('Venta', backref='restaurante', lazy=True)
     gastos = db.relationship('Gasto', backref='restaurante', lazy=True)
     proveedores = db.relationship('Proveedor', backref='restaurante', lazy=True)
+    moneda = db.Colum(db.String(10), nullable=True) 
 
     def serialize(self):
         return {
@@ -19,6 +20,7 @@ class Restaurante(db.Model):
             "nombre": self.nombre,
             "direccion": self.direccion,
             "email_contacto": self.email_contacto,
+            "moneda": self.moneda,
         }
 
 class Usuario(db.Model):

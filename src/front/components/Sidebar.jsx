@@ -70,7 +70,7 @@ export const Sidebar = () => {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/admin/restaurantes">
+                  <Link className="nav-link" to="/admin/Proveedores">
                     <i className="bi bi-shop me-2"></i>Proveedores
                   </Link>
                 </li>
@@ -125,11 +125,6 @@ export const Sidebar = () => {
                 <li className="nav-item">
                   <Link className="nav-link" to="/chef/proveedores">
                     <i className="bi bi-truck me-2"></i>Proveedores
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/chef/facturas">
-                    <i className="bi bi-receipt me-2"></i>Facturas
                   </Link>
                 </li>
                 <li className="nav-item">

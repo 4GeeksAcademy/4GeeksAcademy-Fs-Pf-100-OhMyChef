@@ -14,15 +14,13 @@ export const AdminDashboard = () => {
   );
 };
 
-function App() {
+export function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<AdminDashboardBB />} />
-        <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+        <Route path="/restaurante/:id" element={<RestaurantDetail />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;

@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, Usuario, Venta, Gasto, FacturaAlbaran, Proveedor, MargenObjetivo, Restaurante
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from sqlalchemy import select, func
+from sqlalchemy import select, func, extract
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
@@ -43,7 +43,6 @@ def register():
         total_users = db.session.scalar(
             select(func.count()).select_from(Usuario))
 
-        # ✅ Solo permitir crear sin token si no hay usuarios
         current_user_id = get_jwt_identity()
         if total_users > 0:
             if not current_user_id:
@@ -52,7 +51,7 @@ def register():
             if not current_user or current_user.rol != "admin":
                 return jsonify({"error": "Solo el admin puede crear usuarios"}), 403
 
-        # Validar restaurante obligatorio para roles chef o encargado
+      
         if data["rol"] in ["chef", "encargado"] and not data.get("restaurante_id"):
             return jsonify({"error": "Chef o encargado debe tener restaurante asignado"}), 400
 
@@ -215,6 +214,16 @@ def crear_venta():
         return jsonify({"msg": "Faltan campos obligatorios"}), 400
 
     try:
+        # ❗ Validación: no permitir duplicados por fecha, turno y restaurante
+        venta_existente = db.session.query(Venta).filter_by(
+            fecha=fecha,
+            turno=turno,
+            restaurante_id=restaurante_id
+        ).first()
+
+        if venta_existente:
+            return jsonify({"msg": "Ya existe una venta para este día y turno"}), 409
+
         nueva_venta = Venta(
             fecha=fecha,
             monto=monto,
@@ -224,9 +233,11 @@ def crear_venta():
         db.session.add(nueva_venta)
         db.session.commit()
         return jsonify({"msg": "Venta creada correctamente"}), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al crear la venta", "error": str(e)}), 500
+
 
 
 @api.route('/ventas/<int:id>', methods=['GET'])
@@ -320,7 +331,6 @@ def crear_gasto():
     if not data:
         return jsonify({"msg": "Datos no recibidos"}), 400
 
-    
     if isinstance(data, list):
         try:
             for g in data:
@@ -346,7 +356,6 @@ def crear_gasto():
             db.session.rollback()
             return jsonify({"msg": "Error al registrar gastos", "error": str(e)}), 500
 
-    
     else:
         fecha = data.get("fecha")
         monto = data.get("monto")
@@ -377,7 +386,6 @@ def crear_gasto():
         except Exception as e:
             db.session.rollback()
             return jsonify({"msg": "Error al registrar el gasto", "error": str(e)}), 500
-
 
 
 @api.route('/gastos/<int:id>', methods=['GET'])
@@ -430,6 +438,26 @@ def editar_gasto(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar el gasto", "error": str(e)}), 500
+
+
+@api.route('/gastos/usuario/<int:usuario_id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_gastos_por_usuario(usuario_id):
+    try:
+        gastos = Gasto.query.filter_by(usuario_id=usuario_id).all()
+
+        if not gastos:
+            return jsonify({"msg": "No hay gastos asociados a este usuario"}), 404
+
+        for gasto in gastos:
+            db.session.delete(gasto)
+
+        db.session.commit()
+        return jsonify({"msg": f"{len(gastos)} gastos eliminados para el usuario {usuario_id}"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar los gastos", "error": str(e)}), 500
 
 
 @api.route('/facturas', methods=['GET'])
@@ -868,8 +896,11 @@ def eliminar_restaurante(id):
 @jwt_required()
 def get_user_info():
     try:
-        user_id = get_jwt_identity()
+        user_identity = json.loads(get_jwt_identity())  # 🔁 aquí parseamos el JSON
+        user_id = user_identity["id"]
+
         usuario = db.session.get(Usuario, user_id)
+
         if not usuario:
             return jsonify({"error": "Usuario no encontrado"}), 404
 
@@ -884,3 +915,88 @@ def get_user_info():
 
     except Exception as e:
         return jsonify({"error": "Algo salió mal"}), 500
+
+
+
+
+@api.route("/gastos/resumen-mensual", methods=["GET"])
+@jwt_required()
+def resumen_gastos_mensual():
+    try:
+        user_id = int(get_jwt_identity())
+        usuario = db.session.query(Usuario).get(user_id)
+
+        if not usuario:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+
+        restaurante_id = usuario.restaurante_id
+
+        mes = int(request.args.get("mes", 0))
+        anio = int(request.args.get("ano", 0))
+
+        if not mes or not anio:
+            return jsonify({"msg": "Mes y año son requeridos"}), 400
+
+        gastos = db.session.query(
+            Proveedor.nombre.label("proveedor"),
+            extract("day", Gasto.fecha).label("dia"),
+            func.sum(Gasto.monto).label("total")
+        ).join(Proveedor).filter(
+            Gasto.restaurante_id == restaurante_id,
+            extract("month", Gasto.fecha) == mes,
+            extract("year", Gasto.fecha) == anio
+        ).group_by(Proveedor.nombre, extract("day", Gasto.fecha)).all()
+
+        # Organizar datos en formato tipo tabla
+        resumen = {}
+        totales = {}
+        proveedores = set()
+        dias = set()
+
+        for fila in gastos:
+            proveedor = fila.proveedor
+            dia = int(fila.dia)
+            monto = float(fila.total)
+
+            proveedores.add(proveedor)
+            dias.add(dia)
+
+            if proveedor not in resumen:
+                resumen[proveedor] = {}
+            resumen[proveedor][dia] = monto
+
+            totales[proveedor] = totales.get(proveedor, 0) + monto
+
+        return jsonify({
+            "proveedores": sorted(proveedores),
+            "dias": sorted(dias),
+            "datos": resumen,
+            "totales": totales
+        }), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+    
+@api.route('/cambiar-password', methods=['PUT'])
+@jwt_required()
+def cambiar_password():
+    data = request.get_json()
+    actual = data.get("actual")
+    nueva = data.get("nueva")
+
+    if not actual or not nueva:
+        return jsonify({ "msg": "Faltan datos" }), 400
+
+    user_id = get_jwt_identity()
+    user = Usuario.query.get(user_id)
+
+    if not user:
+        return jsonify({ "msg": "Usuario no encontrado" }), 404
+
+    if not check_password_hash(user.password, actual):
+        return jsonify({ "msg": "Contraseña actual incorrecta" }), 401
+
+    user.password = generate_password_hash(nueva)
+    db.session.commit()
+
+    return jsonify({ "msg": "Contraseña actualizada correctamente" }), 200

@@ -28,7 +28,7 @@ const AdminDashboardBB = () => {
                 <p className="status">Dentro rango</p>
               </div>
             </div>
-            <Link to={`/restaurant/${num}`} className="view-link">View All</Link>
+            <Link to={`/restaurante/${num}`} className="view-link">View All</Link>
           </div>
         ))}
       </div>

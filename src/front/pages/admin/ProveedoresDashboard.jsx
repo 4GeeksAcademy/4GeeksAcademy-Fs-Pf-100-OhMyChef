@@ -1,11 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import RestauranteCardProveedores from '../../components/RestauranteCardProveedores';
+import { ProveedoresCardRestaurante } from '../../components/ProveedoresCardRestaurante.jsx';
 import '../../styles/ProveedoresDashboard.css';
 
-const ProveedoresDashboard = () => {
+export const ProveedoresDashboard = () => {
     const navigate = useNavigate();
-
 
     const restaurantes = [
         { id: '1', name: 'RESTAURANTE # 1', city: 'Valencia', zone: 'zona 1', percentage: 27, status: 'Activo' },
@@ -14,23 +13,22 @@ const ProveedoresDashboard = () => {
         { id: '4', name: 'RESTAURANTE # 4', city: 'Valencia', zone: 'zona 3', percentage: 27, status: 'Activo' },
     ];
 
-
     const handleViewAll = (restauranteId) => {
-        navigate(`/restaurantes/${restauranteId}`);
+        navigate(`/admin/proveedores/restaurante/${restauranteId}`);
     };
 
     return (
-        <div className={styles.container}>
-            <header className={styles.header}>
-                <h1>Proveedor</h1>
-                <p>proveedor por restaurante</p>
+        <div className="dashboard-container p-6 bg-gray-100 min-h-screen">
+            <header className="mb-6">
+                <h1 className="text-3xl font-bold mb-1">Proveedor</h1>
+                <p className="text-gray-600">Proveedor por restaurante</p>
             </header>
 
-            <main className={styles.gridContainer}>
-                {restaurants.map(restaurante => (
-                    <RestaurantCard
+            <main className="dashboard-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {restaurantes.map((restaurante) => (
+                    <ProveedoresCardRestaurante
                         key={restaurante.id}
-                        restaurant={restaurante}
+                        restaurante={restaurante}
                         onViewAll={handleViewAll}
                     />
                 ))}
@@ -38,5 +36,3 @@ const ProveedoresDashboard = () => {
         </div>
     );
 };
-
-export { ProveedoresDashboard };

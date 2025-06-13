@@ -1,34 +1,40 @@
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto; 
-    padding: 20px;
+/* Fondo general del dashboard */
+.dashboard-container {
+  background-color: #f9fafb; /* gray-100 */
+  padding: 24px;
+  min-height: 100vh;
 }
 
-.header {
-    margin-bottom: 30px;
+/* Título principal */
+.dashboard-container h1 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;
+  color: #111827; /* gray-900 */
+  margin-bottom: 4px;
 }
 
-.header h1 {
-    font-size: 2em;
-    color: #333;
-    margin-bottom: 5px;
+/* Subtítulo */
+.dashboard-container p {
+  font-size: 1rem;
+  color: #6b7280; /* gray-500 */
 }
 
-.header p {
-    color: #666;
-    font-size: 1em;
+/* Grid de tarjetas */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 24px;
 }
 
-.gridContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-
-@media (max-width: 768px) {
-    .gridContainer {
-        grid-template-columns: 1fr;
-    }
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }

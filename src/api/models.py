@@ -69,14 +69,21 @@ class Proveedor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     categoria = db.Column(db.String(100))
-    restaurante_id = db.Column(db.Integer, db.ForeignKey(
-        'restaurantes.id'), nullable=False)
+    direccion = db.Column(db.String(200))
+    telefono = db.Column(db.String(50))
+    email_contacto = db.Column(db.String(100))
+    observaciones = db.Column(db.Text)
+    restaurante_id = db.Column(db.Integer, db.ForeignKey('restaurantes.id'), nullable=False)
 
     def serialize(self):
         return {
             "id": self.id,
             "nombre": self.nombre,
             "categoria": self.categoria,
+            "direccion": self.direccion,
+            "telefono": self.telefono,
+            "email_contacto": self.email_contacto,
+            "observaciones": self.observaciones,
             "restaurante_id": self.restaurante_id,
         }
 

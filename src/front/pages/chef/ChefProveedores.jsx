@@ -3,7 +3,7 @@ import useGlobalReducer from "../../hooks/useGlobalReducer";
 import proveedorServices from "../../services/proveedorServices";
 import { ProveedorForm } from "../../components/shared/ProveedorForm";
 
-export const Proveedores = () => {
+export const ChefProveedores  = () => {
   const { store } = useGlobalReducer();
   const restaurante_id = store.user.restaurante_id;
 

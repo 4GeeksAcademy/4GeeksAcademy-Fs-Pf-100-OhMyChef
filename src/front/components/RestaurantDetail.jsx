@@ -27,8 +27,8 @@ const RestaurantDetail = () => {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      fetch(`/api/restaurants/${id}/sales.json`).then(res => res.json()),
-      fetch(`/api/restaurants/${id}/categories.json`).then(res => res.json())
+      fetch(`/api/restaurantes/${id}/sales.json`).then(res => res.json()),
+      fetch(`/api/restaurantes/${id}/categories.json`).then(res => res.json())
     ])
       .then(([sales, categories]) => {
         setSalesData(sales);
@@ -43,7 +43,7 @@ const RestaurantDetail = () => {
   }, [id]);
 
   return (
-    <div className="restaurant-detail-container">
+    <div className="restaurante-detail-container">
       <div className="header">
         <h1>Restaurante #{id}</h1>
         <Link to="/" className="back-btn">← Volver al dashboard</Link>

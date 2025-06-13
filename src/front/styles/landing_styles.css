@@ -1,0 +1,87 @@
+/* Fondo general */
+.landing-container {
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+}
+
+/* Distribución principal */
+.main-row {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+  padding: 0 2rem;
+}
+
+/* Frase izquierda */
+.landing-message {
+  color: #111;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 2rem;
+}
+
+.landing-message h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.landing-message p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Login */
+.login-overlay {
+  background-color: rgba(255, 255, 255, 0.97);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 480px;  
+  min-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  animation: fadeInRight 0.8s ease-in-out;
+}
+
+
+/* Footer */
+.footer-landing {
+  text-align: center;
+  background-color: transparent;
+  color: #6c757d;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
+/* Animación */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Form inputs */
+form input {
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+/* Control de scroll */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+
+

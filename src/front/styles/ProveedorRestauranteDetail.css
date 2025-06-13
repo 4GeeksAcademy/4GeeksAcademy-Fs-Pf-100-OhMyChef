@@ -1,0 +1,41 @@
+.detail-container {
+  background-color: #fff;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 800px;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.back-button {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background-color: #e5e7eb;
+}
+
+.status-detail {
+  font-weight: bold;
+  color: #10b981; /* verde */
+}
+
+.detail-container h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.detail-container p {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  color: #374151;
+}

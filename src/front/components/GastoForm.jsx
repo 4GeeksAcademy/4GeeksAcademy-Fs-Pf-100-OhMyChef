@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import gastoServices from "../services/GastoServices";
 
 export const GastoForm = () => {
   const { store } = useGlobalReducer();
   const user = store.user;
+  const navigate = useNavigate();
 
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
   const [gastos, setGastos] = useState([
@@ -13,8 +15,14 @@ export const GastoForm = () => {
   const [proveedores, setProveedores] = useState([]);
   const [mensaje, setMensaje] = useState("");
 
+  const nombreMes = new Date(fecha).toLocaleString("es", {
+    month: "long",
+    year: "numeric",
+  });
+
   useEffect(() => {
     if (user?.restaurante_id) {
+
       gastoServices
         .getProveedores(user.restaurante_id)
         .then(setProveedores)
@@ -23,22 +31,25 @@ export const GastoForm = () => {
   }, [user]);
 
   const handleChange = (index, e) => {
+
     const updatedGastos = [...gastos];
     updatedGastos[index][e.target.name] = e.target.value;
     setGastos(updatedGastos);
   };
 
   const handleAddRow = () => {
+
     setGastos([...gastos, { proveedor_id: "", categoria: "", monto: "", nota: "" }]);
   };
 
   const handleRemoveRow = (index) => {
+
     const updated = [...gastos];
     updated.splice(index, 1);
     setGastos(updated);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje("");
 
@@ -54,23 +65,28 @@ export const GastoForm = () => {
       ...g,
       fecha,
       usuario_id: user.id,
-      restaurante_id: user.restaurante_id
+      restaurante_id: user.restaurante_id,
     }));
 
-    if (!confirm("¿Confirmas los datos introducidos?")) return;
+    if (!window.confirm("¿Confirmas los datos introducidos?")) return;
 
-    gastoServices
-      .registrarGasto(payload)
-      .then(() => {
-        setMensaje("Gastos registrados con éxito");
-        setGastos([{ proveedor_id: "", categoria: "", monto: "", nota: "" }]);
-      })
-      .catch(() => setMensaje("Error al registrar gastos"));
+    try {
+      await gastoServices.registrarGasto(payload);
+      setMensaje("Gastos registrados con éxito");
+      setGastos([{ proveedor_id: "", categoria: "", monto: "", nota: "" }]);
+
+      setTimeout(() => {
+        navigate(`/${user.rol}/gastos`);
+      }, 1500);
+    } catch {
+      setMensaje("Error al registrar gastos");
+    }
   };
 
   return (
     <div className="container mt-4">
-      <h2>Registrar Gastos del dia</h2>
+      <h2>Registrar Gastos del día</h2>
+      <h5 className="text-muted mb-3">Mes actual: {nombreMes.toUpperCase()}</h5>
 
       <div className="mb-3">
         <label className="form-label">Fecha</label>
@@ -92,6 +108,7 @@ export const GastoForm = () => {
                 name="proveedor_id"
                 value={gasto.proveedor_id}
                 onChange={(e) => handleChange(index, e)}
+                required
               >
                 <option value="">Seleccione</option>
                 {proveedores.map((p) => (
@@ -109,6 +126,7 @@ export const GastoForm = () => {
                 name="categoria"
                 value={gasto.categoria}
                 onChange={(e) => handleChange(index, e)}
+                required
               >
                 <option value="">Seleccione</option>
                 <option value="alimentos">Alimentos</option>
@@ -126,6 +144,9 @@ export const GastoForm = () => {
                 name="monto"
                 value={gasto.monto}
                 onChange={(e) => handleChange(index, e)}
+                min="0"
+                step="0.01"
+                required
               />
             </div>
 
@@ -167,7 +188,16 @@ export const GastoForm = () => {
           </button>
         </div>
 
-        {mensaje && <div className="alert alert-info mt-3">{mensaje}</div>}
+        {mensaje && (
+          <div
+            className={`alert mt-3 ${mensaje.toLowerCase().includes("éxito")
+                ? "alert-success"
+                : "alert-danger"
+              }`}
+          >
+            {mensaje}
+          </div>
+        )}
       </form>
     </div>
   );

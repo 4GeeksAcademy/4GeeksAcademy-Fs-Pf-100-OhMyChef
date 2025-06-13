@@ -1,0 +1,21 @@
+.searchRestaurant > p {
+  flex: 1;
+  align-self: self-end;
+  text-align: right;
+  margin-right: 20px;
+  margin-bottom: 8px;
+}
+
+.searchRestaurant {
+  border-top: 1px solid #ccc;
+}
+
+button.w250{
+    width: 250px;
+}
+@media (max-width: 767px) {
+  .searchRestaurant {
+    flex-direction: column;
+    padding-top: 10px;
+  }
+}

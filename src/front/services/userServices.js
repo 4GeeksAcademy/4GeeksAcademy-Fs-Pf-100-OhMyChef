@@ -19,19 +19,17 @@ userServices.register = async (formData) => {
 };
 
 userServices.getUserinfo = async () => {
-  const token = sessionStorage.getItem("token");
-  const response = await fetch(`${backendUrl}/api/private`, {
+  const resp = await fetch(backendUrl + "/api/private", {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
     },
   });
-  await new Promise((res) => setTimeout(res, 2000));
-  if (!response.ok) throw new Error("No se pudo obtener la información del usuario");
-  const data = await response.json();
+  if (!resp.ok) throw Error("something went wrong");
+  const data = await resp.json();
   return data;
 };
-
 userServices.login = async (formData) => {
   try {
     const resp = await fetch(backendUrl + "/api/login", {

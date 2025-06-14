@@ -19,16 +19,17 @@ export const Sidebar = () => {
   const handleLogout = () => {
     sessionStorage.removeItem("token");
     dispatch({ type: "get_user_info", payload: null });
-    navigate("/login");
+    navigate("/");
   };
 
   return (
-    <div className="sidebar-container d-flex vh-90">
+    <div className="sidebar-container d-flex">
       <nav
         id="sidebar"
-        className={`sidebar menu d-flex flex-column p-3 col-3 col-md-2 ${
-          menuall ? "w150" : ""
-        }`}
+
+        className={`sidebar menu d-flex flex-column p-3 ${menuall ? "w200" : ""
+          }`}
+
       >
         <div className="d-flex justify-content-between align-items-center mb-4">
           <span className={`fs-5 menu fw-bold ${seemenu ? "d-none" : ""}`}>
@@ -66,6 +67,11 @@ export const Sidebar = () => {
                 <li className="nav-item">
                   <Link className="nav-link" to="/admin/gastos">
                     <i className="bi bi-cash-coin me-2"></i>Gastos
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/admin/Proveedores">
+                    <i className="bi bi-shop me-2"></i>Proveedores
                   </Link>
                 </li>
                 <li className="nav-item">
@@ -122,11 +128,6 @@ export const Sidebar = () => {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/chef/facturas">
-                    <i className="bi bi-receipt me-2"></i>Facturas
-                  </Link>
-                </li>
-                   <li className="nav-item">
                   <Link className="nav-link" to="/chef/gastos">
                     <i className="bi bi-receipt me-2"></i>Gastos
                   </Link>
@@ -142,13 +143,12 @@ export const Sidebar = () => {
         </div>
         <div className="logout mt-auto">
           <button
-            className={`nav-link text-muted d-flex align-items-center bg-transparent border-0 ${
-              menuall ? "logout-row" : "logout-column"
-            }`}
+            className={`nav-link text-muted d-flex align-items-center bg-transparent border-0 ${!menuall ? "logout-row" : "logout-column"
+              }`}
             onClick={handleLogout}
           >
             <i className="bi bi-box-arrow-left me-2"></i>
-            <span>Log Out</span>
+            <span className={`${menuall ? "w-60" : "w-auto"}`}>Cerrar sesión</span>
           </button>
         </div>
       </nav>

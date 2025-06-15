@@ -1,14 +1,9 @@
-// components/LineChartExample.jsx
+
 import React from "react";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
 
-// Datos: 30 días con porcentajes aleatorios
-// const data = Array.from({ length: 30 }, (_, i) => ({
-//     name: `${i + 1}`,
-//     porcentaje: Math.floor(Math.random() * 101), // de 0 a 100
-// }));
 
 const GastosChef = ({
     datos,

@@ -1,0 +1,132 @@
+/* Fondo general */
+.landing-container {
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+}
+
+/* Distribución principal */
+.main-row {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+  padding: 0 2rem;
+}
+
+/* Frase izquierda */
+.landing-message {
+  color: #111;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 2rem;
+}
+
+.landing-message h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.landing-message p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+
+.auth-overlay {
+  background-color: rgba(255, 255, 255, 0.536);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 780px;
+  min-width: 300px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  animation: fadeInRight 0.8s ease-in-out;
+}
+
+
+/* Footer */
+.footer-landing {
+  text-align: center;
+  background-color: transparent;
+  color: #6c757d;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
+/* Animación */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Form inputs */
+form input {
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+/* Control de scroll */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+
+/* Móviles pequeños (≤ 576px) */
+@media (max-width: 576px) {
+  .landing-message h1 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+  .landing-message p {
+    font-size: 1rem;
+    text-align: center;
+    padding: 0 1rem;
+  }
+  .auth-overlay {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+  .main-row {
+    flex-direction: column;
+    padding: 0 1rem;
+  }
+}
+/* Tablets (≤ 768px) */
+@media (max-width: 768px) {
+  .landing-message h1 {
+    font-size: 2rem;
+  }
+  .landing-message p {
+    font-size: 1.1rem;
+  }
+  .auth-overlay {
+    margin-top: 2rem;
+    padding: 2rem;
+    max-width: 85%;
+  }
+}
+/* Portátiles pequeños (≤ 992px) */
+@media (max-width: 992px) {
+  .landing-message {
+    padding: 1rem;
+  }
+  .auth-overlay {
+    max-width: 90%;
+  }
+}
+
+

@@ -1,0 +1,11 @@
+
+
+.icono-circular {
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}

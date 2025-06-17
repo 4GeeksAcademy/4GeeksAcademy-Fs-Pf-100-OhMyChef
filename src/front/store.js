@@ -14,6 +14,7 @@ export const initialStore = () => {
         background: null,
       },
     ],
+    restaurantes: [],
   };
 };
 
@@ -29,10 +30,42 @@ export default function storeReducer(store, action = {}) {
         ...store,
         user: action.payload.user,
       };
+    case "get_usuarios":
+      return {
+        ...store,
+        user: action.payload.user,
+      };
     case "set_hello":
       return {
         ...store,
         message: action.payload,
+      };
+    case "set_restaurante":
+      return {
+        ...store,
+        restaurantes: action.payload,
+      };
+    case "add_restaurante":
+      return {
+        ...store,
+        restaurantes: [...store.restaurantes, action.payload],
+      };
+    case "actualizar_restaurante":
+      return {
+        ...store,
+        restaurantes: store.restaurantes.map((r) =>
+          r.id === action.payload.id ? action.payload : r
+        ),
+      };
+    case "remove_restaurante":
+      return {
+        ...store,
+        restaurantes: store.restaurantes.filter((r) => r.id !== action.payload),
+      };
+    case "get_restaurantes":
+      return {
+        ...store,
+        restaurantes: action.payload,
       };
     case "add_task":
       const { id, color } = action.payload;

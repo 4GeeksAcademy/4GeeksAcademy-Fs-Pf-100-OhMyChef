@@ -1,10 +1,6 @@
 import React from "react";
+import { DetalleGastosMensual } from "../../components/shared/DetalleGastosMensual";
 
 export const EncargadoGastos = () => {
-  return (
-    <div className="container mt-4">
-      <h1>Gastos del Encargado</h1>
-    
-    </div>
-  );
+  return <DetalleGastosMensual />;
 };

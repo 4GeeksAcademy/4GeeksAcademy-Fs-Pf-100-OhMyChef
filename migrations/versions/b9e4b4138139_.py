@@ -1,8 +1,14 @@
 """empty message
 
-Revision ID: d8b2dc9a7ffd
+<<<<<<<< HEAD:migrations/versions/c9eef75fd0e2_.py
+Revision ID: c9eef75fd0e2
 Revises: 
-Create Date: 2025-06-03 17:54:01.392674
+Create Date: 2025-06-16 10:04:08.305696
+========
+Revision ID: b9e4b4138139
+Revises: 
+Create Date: 2025-06-16 09:05:37.694188
+>>>>>>>> ce187c70b42819f43d9d0144d998fa2db81a6931:migrations/versions/b9e4b4138139_.py
 
 """
 from alembic import op
@@ -10,7 +16,11 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd8b2dc9a7ffd'
+<<<<<<<< HEAD:migrations/versions/c9eef75fd0e2_.py
+revision = 'c9eef75fd0e2'
+========
+revision = 'b9e4b4138139'
+>>>>>>>> ce187c70b42819f43d9d0144d998fa2db81a6931:migrations/versions/b9e4b4138139_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,6 +32,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nombre', sa.String(length=100), nullable=False),
     sa.Column('direccion', sa.String(length=200), nullable=True),
+    sa.Column('telefono', sa.String(length=11), nullable=True),
     sa.Column('email_contacto', sa.String(length=100), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
@@ -37,6 +48,10 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nombre', sa.String(length=100), nullable=False),
     sa.Column('categoria', sa.String(length=100), nullable=True),
+    sa.Column('direccion', sa.String(length=200), nullable=True),
+    sa.Column('telefono', sa.String(length=50), nullable=True),
+    sa.Column('email_contacto', sa.String(length=100), nullable=True),
+    sa.Column('observaciones', sa.Text(), nullable=True),
     sa.Column('restaurante_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['restaurante_id'], ['restaurantes.id'], ),
     sa.PrimaryKeyConstraint('id')

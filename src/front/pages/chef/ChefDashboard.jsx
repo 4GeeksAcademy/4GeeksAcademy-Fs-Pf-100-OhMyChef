@@ -1,96 +1,113 @@
-import { Link } from "react-router-dom";
 
+import { useEffect, useState } from "react";
 import GastosChef from "../../components/GastosChef";
-import { GastosProveedores } from "../../components/GastosProveedores";
-import { useState } from "react";
+import { TortaCategorias } from "../../components/TortaCategorias";
+import chefServices from "../../services/chefServices";
+import { QuickActionsChef } from "../../components/QuickActionsChef";
 
-
-// datos para chef-gastos
 export const ChefDashboard = () => {
-  const data = Array.from({ length: 30 }, (_, i) => ({
-    name: `${i + 1}`,
-    porcentaje: Math.floor(Math.random() * 101), // de 0 a 100
-  }));
-  const [datos, SetDatos] = useState(data)
+  const [datos, SetDatos] = useState([]);
+  const [resumenMensual, setResumenMensual] = useState(null);
+
+  useEffect(() => {
+    const fecha = new Date();
+    const mes = fecha.getMonth() + 1;
+    const ano = fecha.getFullYear();
+
+    chefServices.resumenDiarioGastos(mes, ano)
+      .then((resumen) => {
+        const data = resumen.map((item) => ({
+          name: `${item.dia}`,
+          porcentaje: item.porcentaje,
+        }));
+        SetDatos(data);
+      })
+      .catch((err) => console.error(err));
+
+    chefServices.resumenGastoMensual(mes, ano)
+      .then((resumen) => setResumenMensual(resumen))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const porcentaje = resumenMensual?.porcentaje || 0;
+  const gasto = resumenMensual?.gastos || 0;
 
 
+  let bgClass = "bg-success-subtle";
+  let textClass = "text-success";
+  let icono = "✅";
 
-  // datos para chef-proveedores
-  const proveedoresget = [
-    { nombre: 'proveedor 1', gasto: 5421 },
-    { nombre: 'proveedor 2', gasto: 58743 },
-    { nombre: 'proveedor 3', gasto: 89644 },
-    { nombre: 'proveedor 4', gasto: 2145 },
-    { nombre: 'proveedor 5', gasto: 9874 },
-    { nombre: 'proveedor 6', gasto: 5213 },
-    { nombre: 'proveedor 7', gasto: 95451 },
-    { nombre: 'proveedor 8', gasto: 3562 },
-    { nombre: 'proveedor 9', gasto: 9874 },
-  ];
-  const [proveedores, SetProveedores] = useState(proveedoresget)
-
-
+  if (porcentaje > 36) {
+    bgClass = "bg-danger-subtle";
+    textClass = "text-danger";
+    icono = "🚨";
+  } else if (porcentaje > 33) {
+    bgClass = "bg-warning-subtle";
+    textClass = "text-warning";
+    icono = "⚠️";
+  }
 
   return (
-    <>
-      <div className="row ltr-scroll">
-        <div className="graficoVentas col-sm-12 col-md-12 col-lg-11 col-xl-11 col-xxl-10 d-flex border pt-4 pb-4 mt-2 flex-sm-column flex-md-row">
-
-          <div className="col-sm-12 justify-content-sm-around justify-content-md-start col-md-2 col-lg-2 gastos d-flex flex-sm-row flex-md-column  order-sm-2 order-md-1 ps-sm-0 ps-md-2 mt-sm-5 mb-sm-5 mt-md-0 mb-md-0 fs-5">
-            <span className="d-flex flex-column fs-6 mt-sm-0">
-              <span className="color-green fs-4">Gastos actuales</span>
-              <span className="mt-2 fs-5 fw-bold text-secondary">2000€</span>
-            </span>
-
-            <span className="d-flex flex-column fs-6 mt-sm-0 mt-lg-4">
-              <span className="color-blue">Porcentaje de gastos</span>
-              <span className="caja-azul mt-2 fs-5 fw-bold text-secondary">2000€</span>
-            </span>
+    <div className="dashboard-container ps-2 row py-3 pt-4">
+      <h1 className="dashboard-title">Graficas en Porcentajes</h1>
+      <p class="dashboard-welcome mb-4">Graficas de gastos</p>
+      <div className="row justify-content-start">
+        <div className="col-lg-11">
+          <div className="card shadow-sm border rounded p-4">
+            <div className="row align-items-center">
+              <div className="col-md-3 d-flex flex-column gap-4 w- align-items-center">
 
 
+                <div className="rounded shadow-sm p-3 text-center bg-info-subtle w-80">
+                  <div className="rounded-circle bg-white text-info d-inline-flex align-items-center justify-content-center mb-2"
+                    style={{ width: "50px", height: "50px", fontSize: "1.5rem" }}>
+                    💸
+                  </div>
+                  <h6 className="fw-bold text-info">Gastos Actuales</h6>
+                  <div className="fs-4 fw-bold text-dark">
+                    {gasto} €
+                  </div>
+                </div>
+
+
+                <div className={`rounded shadow-sm p-3 text-center w-80 ${bgClass}`}>
+                  <div className={`rounded-circle ${textClass} bg-white d-inline-flex align-items-center justify-content-center mb-2`}
+                    style={{ width: "50px", height: "50px", fontSize: "1.5rem" }}>
+                    {icono}
+                  </div>
+                  <h6 className={`fw-bold ${textClass}`}>Porcentaje Gastos</h6>
+                  <div className={`fs-4 fw-bold ${textClass}`}>
+                    {porcentaje} %
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="col-md-9 w-90">
+                <h5 className="text-center mb-3">Gráfica de Gastos Diario</h5>
+                <GastosChef
+                  datos={datos}
+                  ancho={800}
+                  alto={300}
+                  rol="chef"
+                  xAxisProps={{ dataKey: "name", interval: 0 }}
+                  yAxisProps={{ domain: [0, 100], tickFormatter: (v) => `${v}%` }}
+                  tooltipProps={{ formatter: (v) => `${v}%` }}
+                  lineProps={{ dataKey: "porcentaje", stroke: "#82ca9d", strokeWidth: 2, dot: { r: 3 } }}
+                />
+              </div>
+            </div>
           </div>
-          <div className="col-sm-11 col-md-10 col-xxl-9  ms-md-4 ms-lg-0 order-sm-1 order-md-2  ">
-            <h5 className=" titulo pt-1 ms-sm-0 ms-md-4 ms-4">Gráfica de Ventas </h5>
-            <GastosChef
-              datos={datos}
-              ancho={800}
-              alto={300}
-              rol="chef"
-              margen={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              xAxisProps={{ dataKey: "name", interval: 0 }}
-              yAxisProps={{ domain: [0, 100], tickFormatter: (v) => `${v}%` }}
-              tooltipProps={{ formatter: (v) => `${v}%` }}
-              lineProps={{ dataKey: "porcentaje", stroke: "#82ca9d", strokeWidth: 2, dot: { r: 3 } }}
-            />
-            
+
+          <div className="card mt-4 shadow-sm border rounded p-4">
+            <TortaCategorias />
           </div>
 
+          <div className="card mt-4 shadow-sm border rounded p-4">
+            <QuickActionsChef />
+          </div>
         </div>
       </div>
-
-      <div className="row ltr-scroll">
-        <div className="graficoGastos col-sm-12 col-md-12 col-lg-11 col-xl-11 col-xxl-10 d-flex border pt-4 pb-4 mt-2 flex-sm-column flex-md-row">
-
-          <div className="col-sm-12 justify-content-sm-around justify-content-md-start col-md-2 col-lg-2 gastos d-flex flex-sm-row flex-md-column  order-sm-2 order-md-1 ps-sm-0 ps-md-2 mt-sm-5 mb-sm-5 mt-md-0 mb-md-0 fs-5">
-            <span className="d-flex flex-column fs-6 mt-sm-0 ">
-              <span className="color-green fs-4">Gastos Proveedores</span>
-              <span className="mt-2 fs-5 fw-bold text-secondary">2000€</span>
-            </span>
-
-            <span className="d-flex flex-column fs-6 mt-sm-0 mt-lg-4">
-              <span className="color-blue">Porcentaje de gastos</span>
-              <span className="caja-azul mt-2 fs-5 fw-bold text-secondary">2000€</span>
-            </span>
-
-
-          </div>
-          <div className="col-sm-11 col-md-9 ms-md-5 ms-lg-5 ms-2 order-sm-1 order-md-2 ">
-            <h5 className=" titulo pb-4 ms-sm-0 ms-md-0 ms-4 pt-2">Resumen de Proveedores</h5>
-            <GastosProveedores proveedores={proveedores} />
-          </div>
-
-        </div>
-      </div>
-    </>
+    </div>
   );
 };

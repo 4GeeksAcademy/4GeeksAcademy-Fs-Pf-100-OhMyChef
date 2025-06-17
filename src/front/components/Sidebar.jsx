@@ -16,19 +16,21 @@ export const Sidebar = () => {
     setMenuall(!menuall);
   };
 
+
   const handleLogout = () => {
     sessionStorage.removeItem("token");
     dispatch({ type: "get_user_info", payload: null });
-    navigate("/login");
+    navigate("/");
   };
 
   return (
-    <div className="sidebar-container d-flex vh-90">
+    <div className="sidebar-container d-flex">
       <nav
         id="sidebar"
-        className={`sidebar menu d-flex flex-column p-3 col-3 col-md-2 ${
-          menuall ? "w150" : ""
-        }`}
+
+        className={`sidebar menu d-flex flex-column p-3 ${menuall ? "w200" : ""
+          }`}
+
       >
         <div className="d-flex justify-content-between align-items-center mb-4">
           <span className={`fs-5 menu fw-bold ${seemenu ? "d-none" : ""}`}>
@@ -48,32 +50,37 @@ export const Sidebar = () => {
           <ul className="nav nav-pills flex-column">
             {rol === "admin" && (
               <>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/admin/dashboard" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/admin/dashboard">
                     <i className="bi bi-house me-2"></i>Dashboard
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/admin/restaurantes/restaurant" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/admin/restaurantes">
                     <i className="bi bi-shop me-2"></i>Restaurantes
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/admin/ventas" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/admin/ventas">
                     <i className="bi bi-bar-chart me-2"></i>Ventas
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/admin/gastos" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/admin/gastos">
                     <i className="bi bi-cash-coin me-2"></i>Gastos
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/admin/proveedores" ? "color-orange-bold" : ""}`}>
+                  <Link className="nav-link" to="/admin/proveedores">
+                    <i className="bi bi-shop me-2"></i>Proveedores
+                  </Link>
+                </li>
+                <li className={`nav-item ${location.pathname === "/admin/usuarios" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/admin/usuarios">
                     <i className="bi bi-people me-2"></i>Usuarios
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/admin/settings" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/admin/settings">
                     <i className="bi bi-gear me-2"></i>Configuración
                   </Link>
@@ -82,27 +89,28 @@ export const Sidebar = () => {
             )}
             {rol === "encargado" && (
               <>
-                <li className="nav-item">
+
+                <li className={`nav-item ${location.pathname === "/encargado/dashboard" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/encargado/dashboard">
                     <i className="bi bi-house me-2"></i>Dashboard
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/encargado/ventas" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/encargado/ventas">
                     <i className="bi bi-bar-chart me-2"></i>Ventas
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/encargado/gastos" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/encargado/gastos">
                     <i className="bi bi-cash-stack me-2"></i>Gastos
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/encargado/proveedores" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/encargado/proveedores">
                     <i className="bi bi-truck me-2"></i>Proveedores
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/encargado/settings" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/encargado/settings">
                     <i className="bi bi-gear me-2"></i>Configuración
                   </Link>
@@ -111,27 +119,22 @@ export const Sidebar = () => {
             )}
             {rol === "chef" && (
               <>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/chef/dashboard" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/chef/dashboard">
                     <i className="bi bi-house me-2"></i>Dashboard
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/chef/proveedores" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/chef/proveedores">
                     <i className="bi bi-truck me-2"></i>Proveedores
                   </Link>
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/chef/facturas">
-                    <i className="bi bi-receipt me-2"></i>Facturas
-                  </Link>
-                </li>
-                   <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/chef/gastos" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/chef/gastos">
                     <i className="bi bi-receipt me-2"></i>Gastos
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className={`nav-item ${location.pathname === "/chef/settings" ? "color-orange-bold" : ""}`}>
                   <Link className="nav-link" to="/chef/settings">
                     <i className="bi bi-gear me-2"></i>Configuración
                   </Link>
@@ -142,13 +145,12 @@ export const Sidebar = () => {
         </div>
         <div className="logout mt-auto">
           <button
-            className={`nav-link text-muted d-flex align-items-center bg-transparent border-0 ${
-              menuall ? "logout-row" : "logout-column"
-            }`}
+            className={`nav-link text-muted d-flex align-items-center bg-transparent border-0 ${!menuall ? "logout-row" : "logout-column"
+              }`}
             onClick={handleLogout}
           >
             <i className="bi bi-box-arrow-left me-2"></i>
-            <span>Log Out</span>
+            <span className={`${menuall ? "w-60" : "w-auto"}`}>Cerrar sesión</span>
           </button>
         </div>
       </nav>

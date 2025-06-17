@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, Usuario, Venta, Gasto, FacturaAlbaran, Proveedor, MargenObjetivo, Restaurante
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from sqlalchemy import select, func
+from sqlalchemy import select, func, extract
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
@@ -43,7 +43,6 @@ def register():
         total_users = db.session.scalar(
             select(func.count()).select_from(Usuario))
 
-        # ✅ Solo permitir crear sin token si no hay usuarios
         current_user_id = get_jwt_identity()
         if total_users > 0:
             if not current_user_id:
@@ -52,7 +51,7 @@ def register():
             if not current_user or current_user.rol != "admin":
                 return jsonify({"error": "Solo el admin puede crear usuarios"}), 403
 
-        # Validar restaurante obligatorio para roles chef o encargado
+      
         if data["rol"] in ["chef", "encargado"] and not data.get("restaurante_id"):
             return jsonify({"error": "Chef o encargado debe tener restaurante asignado"}), 400
 
@@ -179,7 +178,7 @@ def login():
         if not check_password_hash(user.password, data["password"]):
             return jsonify({"success": False, "msg": "Email o contraseña incorrectos"}), 401
 
-        token = create_access_token(identity=user.id)
+        token = create_access_token(identity=str(user.id))
 
         data = user.serialize()
 
@@ -196,6 +195,33 @@ def login():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+    
+@api.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.get_json()
+    email = data.get("email")
+    if not email:
+        return jsonify({"msg": "Correo electrónico requerido"}), 400
+    user = Usuario.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "No existe ninguna cuenta con ese correo"}), 404
+    # Simulación de envío de email
+    print(f"Simulando envío de email a {email} con enlace para restablecer contraseña.")
+    return jsonify({"msg": "Revisa tu correo electrónico"}), 200
+
+@api.route("/reset-password", methods=["POST"])
+def reset_password():
+    data = request.get_json()
+    email = data.get("email")
+    new_password = data.get("new_password")
+    if not email or not new_password:
+        return jsonify({"msg": "Datos incompletos"}), 400
+    user = Usuario.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    return jsonify({"msg": "Contraseña actualizada correctamente"}), 200
 
 
 @api.route('/ventas', methods=['POST'])
@@ -215,6 +241,16 @@ def crear_venta():
         return jsonify({"msg": "Faltan campos obligatorios"}), 400
 
     try:
+        # ❗ Validación: no permitir duplicados por fecha, turno y restaurante
+        venta_existente = db.session.query(Venta).filter_by(
+            fecha=fecha,
+            turno=turno,
+            restaurante_id=restaurante_id
+        ).first()
+
+        if venta_existente:
+            return jsonify({"msg": "Ya existe una venta para este día y turno"}), 409
+
         nueva_venta = Venta(
             fecha=fecha,
             monto=monto,
@@ -224,6 +260,7 @@ def crear_venta():
         db.session.add(nueva_venta)
         db.session.commit()
         return jsonify({"msg": "Venta creada correctamente"}), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al crear la venta", "error": str(e)}), 500
@@ -320,35 +357,61 @@ def crear_gasto():
     if not data:
         return jsonify({"msg": "Datos no recibidos"}), 400
 
-    fecha = data.get("fecha")
-    monto = data.get("monto")
-    categoria = data.get("categoria")
-    proveedor_id = data.get("proveedor_id")
-    usuario_id = data.get("usuario_id")
-    restaurante_id = data.get("restaurante_id")
-    nota = data.get("nota")
-    archivo_adjunto = data.get("archivo_adjunto")
+    if isinstance(data, list):
+        try:
+            for g in data:
+                if not g.get("fecha") or not g.get("monto") or not g.get("proveedor_id") or not g.get("usuario_id") or not g.get("restaurante_id"):
+                    return jsonify({"msg": "Faltan campos obligatorios en uno de los gastos"}), 400
 
-    if not fecha or not monto or not proveedor_id or not usuario_id or not restaurante_id:
-        return jsonify({"msg": "Faltan campos obligatorios"}), 400
+                nuevo_gasto = Gasto(
+                    fecha=g["fecha"],
+                    monto=g["monto"],
+                    categoria=g.get("categoria"),
+                    proveedor_id=g["proveedor_id"],
+                    usuario_id=g["usuario_id"],
+                    restaurante_id=g["restaurante_id"],
+                    nota=g.get("nota"),
+                    archivo_adjunto=g.get("archivo_adjunto")
+                )
+                db.session.add(nuevo_gasto)
 
-    try:
-        nuevo_gasto = Gasto(
-            fecha=fecha,
-            monto=monto,
-            categoria=categoria,
-            proveedor_id=proveedor_id,
-            usuario_id=usuario_id,
-            restaurante_id=restaurante_id,
-            nota=nota,
-            archivo_adjunto=archivo_adjunto
-        )
-        db.session.add(nuevo_gasto)
-        db.session.commit()
-        return jsonify({"msg": "Gasto registrado correctamente"}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"msg": "Error al registrar el gasto", "error": str(e)}), 500
+            db.session.commit()
+            return jsonify({"msg": "Gastos registrados correctamente"}), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": "Error al registrar gastos", "error": str(e)}), 500
+
+    else:
+        fecha = data.get("fecha")
+        monto = data.get("monto")
+        categoria = data.get("categoria")
+        proveedor_id = data.get("proveedor_id")
+        usuario_id = data.get("usuario_id")
+        restaurante_id = data.get("restaurante_id")
+        nota = data.get("nota")
+        archivo_adjunto = data.get("archivo_adjunto")
+
+        if not fecha or not monto or not proveedor_id or not usuario_id or not restaurante_id:
+            return jsonify({"msg": "Faltan campos obligatorios"}), 400
+
+        try:
+            nuevo_gasto = Gasto(
+                fecha=fecha,
+                monto=monto,
+                categoria=categoria,
+                proveedor_id=proveedor_id,
+                usuario_id=usuario_id,
+                restaurante_id=restaurante_id,
+                nota=nota,
+                archivo_adjunto=archivo_adjunto
+            )
+            db.session.add(nuevo_gasto)
+            db.session.commit()
+            return jsonify({"msg": "Gasto registrado correctamente"}), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": "Error al registrar el gasto", "error": str(e)}), 500
 
 
 @api.route('/gastos/<int:id>', methods=['GET'])
@@ -401,6 +464,26 @@ def editar_gasto(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar el gasto", "error": str(e)}), 500
+
+
+@api.route('/gastos/usuario/<int:usuario_id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_gastos_por_usuario(usuario_id):
+    try:
+        gastos = Gasto.query.filter_by(usuario_id=usuario_id).all()
+
+        if not gastos:
+            return jsonify({"msg": "No hay gastos asociados a este usuario"}), 404
+
+        for gasto in gastos:
+            db.session.delete(gasto)
+
+        db.session.commit()
+        return jsonify({"msg": f"{len(gastos)} gastos eliminados para el usuario {usuario_id}"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar los gastos", "error": str(e)}), 500
 
 
 @api.route('/facturas', methods=['GET'])
@@ -733,14 +816,22 @@ def eliminar_margen(id):
 @jwt_required()
 def get_restaurantes():
     restaurantes = Restaurante.query.all()
-
     resultados = []
     for r in restaurantes:
         resultados.append({
             "id": r.id,
             "nombre": r.nombre,
             "direccion": r.direccion,
-            "email_contacto": r.email_contacto
+            "email_contacto": r.email_contacto,
+            "telefono": r.telefono,
+            "usuarios": [{
+                "nombre": u.nombre,
+                "id": u.id,
+                "rol": u.rol
+            }
+                for u in r.usuarios
+            ]
+            # "usuarios": [u.serialize() for u in r.usuarios]
         })
 
     return jsonify(resultados), 200
@@ -757,6 +848,7 @@ def crear_restaurante():
     nombre = data.get("nombre")
     direccion = data.get("direccion")
     email_contacto = data.get("email_contacto")
+    telefono = data.get("telefono")
 
     if not nombre:
         return jsonify({"msg": "El campo 'nombre' es obligatorio"}), 400
@@ -765,11 +857,15 @@ def crear_restaurante():
         nuevo = Restaurante(
             nombre=nombre,
             direccion=direccion,
-            email_contacto=email_contacto
+            email_contacto=email_contacto,
+            telefono=telefono
         )
         db.session.add(nuevo)
         db.session.commit()
-        return jsonify({"msg": "Restaurante creado correctamente"}), 201
+        return jsonify({
+            "msg": "Restaurante creado correctamente",
+            "nuevo": nuevo.serialize()
+        }), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al crear el restaurante", "error": str(e)}), 500
@@ -839,8 +935,12 @@ def eliminar_restaurante(id):
 @jwt_required()
 def get_user_info():
     try:
-        user_id = get_jwt_identity()
+        # 🔁 aquí parseamos el JSON
+        user_identity = json.loads(get_jwt_identity())
+        user_id = user_identity["id"]
+
         usuario = db.session.get(Usuario, user_id)
+
         if not usuario:
             return jsonify({"error": "Usuario no encontrado"}), 404
 
@@ -855,3 +955,295 @@ def get_user_info():
 
     except Exception as e:
         return jsonify({"error": "Algo salió mal"}), 500
+
+
+@api.route("/gastos/resumen-mensual", methods=["GET"])
+@jwt_required()
+def resumen_gastos_mensual():
+    try:
+        user_id = int(get_jwt_identity())
+        usuario = db.session.query(Usuario).get(user_id)
+
+        if not usuario:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+
+        restaurante_id = usuario.restaurante_id
+
+        mes = int(request.args.get("mes", 0))
+        anio = int(request.args.get("ano", 0))
+
+        if not mes or not anio:
+            return jsonify({"msg": "Mes y año son requeridos"}), 400
+
+        gastos = db.session.query(
+            Proveedor.nombre.label("proveedor"),
+            extract("day", Gasto.fecha).label("dia"),
+            func.sum(Gasto.monto).label("total")
+        ).join(Proveedor).filter(
+            Gasto.restaurante_id == restaurante_id,
+            extract("month", Gasto.fecha) == mes,
+            extract("year", Gasto.fecha) == anio
+        ).group_by(Proveedor.nombre, extract("day", Gasto.fecha)).all()
+
+        # Organizar datos en formato tipo tabla
+        resumen = {}
+        totales = {}
+        proveedores = set()
+        dias = set()
+
+        for fila in gastos:
+            proveedor = fila.proveedor
+            dia = int(fila.dia)
+            monto = float(fila.total)
+
+            proveedores.add(proveedor)
+            dias.add(dia)
+
+            if proveedor not in resumen:
+                resumen[proveedor] = {}
+            resumen[proveedor][dia] = monto
+
+            totales[proveedor] = totales.get(proveedor, 0) + monto
+
+        return jsonify({
+            "proveedores": sorted(proveedores),
+            "dias": sorted(dias),
+            "datos": resumen,
+            "totales": totales
+        }), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+
+
+@api.route('/cambiar-password', methods=['PUT'])
+@jwt_required()
+def cambiar_password():
+    data = request.get_json()
+    actual = data.get("actual")
+    nueva = data.get("nueva")
+
+    if not actual or not nueva:
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    user_id = get_jwt_identity()
+    user = Usuario.query.get(user_id)
+
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    if not check_password_hash(user.password, actual):
+        return jsonify({"msg": "Contraseña actual incorrecta"}), 401
+
+    user.password = generate_password_hash(nueva)
+    db.session.commit()
+
+    return jsonify({ "msg": "Contraseña actualizada correctamente" }), 200
+
+
+@api.route("/gastos/porcentaje-mensual", methods=["GET"])
+@jwt_required()
+def porcentaje_gasto_mensual():
+    try:
+        user_id = int(get_jwt_identity())
+        usuario = Usuario.query.get(user_id)
+        if not usuario or not usuario.restaurante_id:
+            return jsonify({"msg": "Usuario no válido"}), 404
+
+        restaurante_id = usuario.restaurante_id
+        mes = int(request.args.get("mes", 0))
+        anio = int(request.args.get("ano", 0))
+
+        if not mes or not anio:
+            return jsonify({"msg": "Mes y año requeridos"}), 400
+
+        total_gastos = db.session.query(
+            func.sum(Gasto.monto)
+        ).filter(
+            Gasto.restaurante_id == restaurante_id,
+            extract("month", Gasto.fecha) == mes,
+            extract("year", Gasto.fecha) == anio
+        ).scalar() or 0
+
+        total_ventas = db.session.query(
+            func.sum(Venta.monto)
+        ).filter(
+            Venta.restaurante_id == restaurante_id,
+            extract("month", Venta.fecha) == mes,
+            extract("year", Venta.fecha) == anio
+        ).scalar() or 0
+
+        porcentaje = round((total_gastos / total_ventas) * 100, 2) if total_ventas else 0
+
+        return jsonify({
+            "gastos": round(total_gastos, 2),
+            "ventas": round(total_ventas, 2),
+            "porcentaje": porcentaje
+        }), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+
+@api.route('/api/encargado/resumen-porcentaje/<int:restaurante_id>/<int:mes>/<int:ano>', methods=['GET'])
+@jwt_required()
+def resumen_porcentaje(restaurante_id, mes, ano):
+ 
+    ventas = db.session.query(func.sum(Venta.monto)).filter(
+        Venta.restaurante_id == restaurante_id,
+        extract('month', Venta.fecha) == mes,
+        extract('year', Venta.fecha) == ano
+    ).scalar() or 0
+
+   
+    gastos = db.session.query(func.sum(Gasto.monto)).filter(
+        Gasto.restaurante_id == restaurante_id,
+        extract('month', Gasto.fecha) == mes,
+        extract('year', Gasto.fecha) == ano
+    ).scalar() or 0
+
+ 
+    porcentaje = round((gastos / ventas) * 100, 2) if ventas > 0 else 0
+
+    return jsonify({
+        "ventas": round(ventas, 2),
+        "gastos": round(gastos, 2),
+        "porcentaje": porcentaje
+    }), 200
+
+@api.route("/gastos/resumen-diario", methods=["GET"])
+@jwt_required()
+def resumen_diario_gastos():
+    try:
+        user_id = int(get_jwt_identity())
+        usuario = Usuario.query.get(user_id)
+
+        if not usuario or not usuario.restaurante_id:
+            return jsonify({"msg": "Usuario no válido"}), 404
+
+        restaurante_id = usuario.restaurante_id
+        mes = int(request.args.get("mes", 0))
+        ano = int(request.args.get("ano", 0))
+
+        if not mes or not ano:
+            return jsonify({"msg": "Mes y año requeridos"}), 400
+
+      
+        ventas_diarias = db.session.query(
+            extract("day", Venta.fecha).label("dia"),
+            func.sum(Venta.monto).label("ventas")
+        ).filter(
+            Venta.restaurante_id == restaurante_id,
+            extract("month", Venta.fecha) == mes,
+            extract("year", Venta.fecha) == ano
+        ).group_by(
+            extract("day", Venta.fecha)
+        ).all()
+
+        # Obtener gastos por día
+        gastos_diarios = db.session.query(
+            extract("day", Gasto.fecha).label("dia"),
+            func.sum(Gasto.monto).label("gastos")
+        ).filter(
+            Gasto.restaurante_id == restaurante_id,
+            extract("month", Gasto.fecha) == mes,
+            extract("year", Gasto.fecha) == ano
+        ).group_by(
+            extract("day", Gasto.fecha)
+        ).all()
+
+        resumen = []
+        dias = set()
+
+        ventas_dict = {int(v.dia): float(v.ventas) for v in ventas_diarias}
+        gastos_dict = {int(g.dia): float(g.gastos) for g in gastos_diarios}
+        dias.update(ventas_dict.keys())
+        dias.update(gastos_dict.keys())
+
+        for dia in sorted(dias):
+            ventas = ventas_dict.get(dia, 0)
+            gastos = gastos_dict.get(dia, 0)
+            porcentaje = round((gastos / ventas) * 100, 2) if ventas > 0 else 0
+
+            resumen.append({
+                "dia": dia,
+                "ventas": ventas,
+                "gastos": gastos,
+                "porcentaje": porcentaje
+            })
+
+        return jsonify(resumen), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+
+@api.route('/gastos/categorias-resumen', methods=['GET'])
+@jwt_required()
+def gastos_por_categoria():
+    try:
+        user_id = int(get_jwt_identity())
+        usuario = Usuario.query.get(user_id)
+
+        if not usuario or not usuario.restaurante_id:
+            return jsonify({"msg": "Usuario no válido"}), 404
+
+        restaurante_id = usuario.restaurante_id
+        mes = int(request.args.get("mes", 0))
+        ano = int(request.args.get("ano", 0))
+
+        if not mes or not ano:
+            return jsonify({"msg": "Mes y año requeridos"}), 400
+
+        resumen = db.session.query(
+            Gasto.categoria,
+            func.sum(Gasto.monto).label("total")
+        ).filter(
+            Gasto.restaurante_id == restaurante_id,
+            extract("month", Gasto.fecha) == mes,
+            extract("year", Gasto.fecha) == ano
+        ).group_by(Gasto.categoria).all()
+
+        resultado = [{"categoria": r.categoria or "Sin categoría", "total": float(r.total)} for r in resumen]
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+
+@api.route("/ventas/resumen-diario", methods=["GET"])
+@jwt_required()
+def resumen_ventas_diario():
+    try:
+        user_id = int(get_jwt_identity())
+        usuario = Usuario.query.get(user_id)
+
+        if not usuario or not usuario.restaurante_id:
+            return jsonify({"msg": "Usuario no válido"}), 404
+
+        restaurante_id = usuario.restaurante_id
+        mes = int(request.args.get("mes", 0))
+        ano = int(request.args.get("ano", 0))
+
+        if not mes or not ano:
+            return jsonify({"msg": "Mes y año requeridos"}), 400
+
+        ventas_diarias = db.session.query(
+            extract("day", Venta.fecha).label("dia"),
+            func.sum(Venta.monto).label("monto")
+        ).filter(
+            Venta.restaurante_id == restaurante_id,
+            extract("month", Venta.fecha) == mes,
+            extract("year", Venta.fecha) == ano
+        ).group_by(
+            extract("day", Venta.fecha)
+        ).order_by(
+            extract("day", Venta.fecha)
+        ).all()
+
+        resultado = [{"dia": int(row.dia), "monto": float(row.monto)} for row in ventas_diarias]
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+
+

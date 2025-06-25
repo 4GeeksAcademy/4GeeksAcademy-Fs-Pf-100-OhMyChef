@@ -268,16 +268,12 @@ def editar_usuario(id):
         if not user_to_update:
             return jsonify({"error": "Usuario no encontrado"}), 404
 
-        admin_password = data.get("adminPassword")
-        if not admin_password or not check_password_hash(current_user.password, admin_password):
-            return jsonify({"error": "Contraseña del administrador incorrecta"}), 401
-
         user_to_update.nombre = data.get("nombre", user_to_update.nombre)
         user_to_update.email = data.get("email", user_to_update.email)
+
         if data.get("password"):
             user_to_update.password = generate_password_hash(data["password"])
 
-        # Rol y validación
         new_rol = data.get("rol", user_to_update.rol)
         if new_rol == "admin":
             existing_admin = db.session.scalar(
@@ -288,10 +284,10 @@ def editar_usuario(id):
 
         if user_to_update.rol in ["chef", "encargado"] and not data.get("restaurante_id"):
             return jsonify({"error": "Chef o encargado debe tener restaurante asignado"}), 400
+
         user_to_update.restaurante_id = data.get(
             "restaurante_id", user_to_update.restaurante_id) if user_to_update.rol != "admin" else None
 
-        # 👇 Aquí se actualiza el status
         user_to_update.status = data.get("status", user_to_update.status)
 
         db.session.commit()
